@@ -32,7 +32,7 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 					else
 						handler = handlers.shift()
 						if handler
-							handler.call context
+							handler.call req.context
 						else
 							next()
 				respond: (err, o) ->

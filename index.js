@@ -35,8 +35,7 @@ module.exports = function(server, log, resourcesPath) {
     fullUri = "" + currentConfiguringControllerPath + "/" + relativeUri;
     currentConfiguringControllerActions.push("" + verb + " " + relativeUri);
     return server[verb](fullUri, function(req, res, next) {
-      var context;
-      context = {
+      req.context = res.context = {
         req: req,
         res: res,
         next: function(err) {
@@ -65,7 +64,7 @@ module.exports = function(server, log, resourcesPath) {
           }
         }
       };
-      return context.next();
+      return req.context.next();
     });
   };
   global.GET = function(relativeUri, handler) {
