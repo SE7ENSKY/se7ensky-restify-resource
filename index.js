@@ -44,7 +44,7 @@ module.exports = function(server, log, resourcesPath) {
           } else {
             handler = handlers.shift();
             if (handler) {
-              return handler.call(context);
+              return handler.call(req.context);
             } else {
               return next();
             }
