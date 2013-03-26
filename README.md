@@ -13,12 +13,15 @@ Usage
 -----
 server.coffee:
 ```coffee
-CONTROLLERS_PATH = "#{__dirname}/resources"
+...
 log = bunyan.createLogger ...
 server = restify.createServer ...
 server.use ...
-require('se7ensky-restify-resource')(server, log, CONTROLLERS_PATH)
-server.resource 'items'
+...
+
+require('se7ensky-restify-resource')(server, log, "#{__dirname}/resources") # initialize module
+
+server.resource 'items' # initialize resource under URI '/items'
 ```
 
 resources/items.coffee
