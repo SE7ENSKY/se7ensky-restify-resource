@@ -1,0 +1,34 @@
+{
+    "name": "se7ensky-restify-resource",
+    "description": "Pretty resource routing for restify",
+    "version": "1.0.0",
+    "homepage" : "https://github.com/Se7enSky/se7ensky-restify-resource",
+    "engines": {
+        "node": "*"
+    },
+    "author": "Se7enSky studio <info@se7ensky.com>",
+
+    "keywords": [
+        "restify",
+        "routing",
+        "rest",
+        "dsl"
+    ],
+
+    "dependencies": {
+        "restify": "*"
+    },
+
+    "repository" : {
+        "type" : "git",
+        "url" : "https://github.com/Se7enSky/se7ensky-restify-resource.git"
+    },
+    "licenses": [{
+        "type": "mit"
+    }],
+    "readmeFilename": "README.md",
+
+    "scripts": {
+        "prepublish": "coffee -c -b index.coffee"
+    }
+}
