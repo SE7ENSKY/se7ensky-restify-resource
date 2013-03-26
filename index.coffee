@@ -4,15 +4,10 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 	currentConfiguringControllerName = null
 	currentConfiguringControllerPath = null
 	currentConfiguringControllerActions = []
-	registerControllerMethod = (verb, args...) ->
-		if typeof args[0] is 'string'
-			relativeUri = args[0]
-			args.splice 0, 1
-		else
-			relativeUri = '/'
+	registerControllerMethod = (verb, args) ->
+		relativeUri = if typeof args[0] is 'string' then args.shift() else ''
 
-		handlers = args
-		for handler in handlers
+		for handler in args
 			if typeof handler isnt 'function'
 				log.error
 					controller: currentConfiguringControllerPath
@@ -21,19 +16,25 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 				, 'Resource misconfiguration: non-function handler passed'
 
 		fullUri = "#{currentConfiguringControllerPath}/#{relativeUri}"
-		currentConfiguringControllerActions.push "#{verb} #{relativeUri}"
+		currentConfiguringControllerActions.push "#{verb} #{fullUri}"
 		server[verb] fullUri, (req, res, next) ->
+			handlers = args.slice()
+			req.log.debug { req: req }, "Received request"
 			req.context = res.context =
 				req: req
 				res: res
 				next: (err) ->
 					if err
+						req.log.error { err: err }, "Error handling request"
 						next err
 					else
 						handler = handlers.shift()
 						if handler
+							callNext = handlers.length is 0
 							handler.call req.context
+							req.context.next() if callNext
 						else
+							req.log.debug { res: res }, "Request handled"
 							next()
 				respond: (err, o) ->
 					if err
@@ -48,11 +49,11 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 						next err
 			req.context.next()
 
-	global.GET = (relativeUri, handler = null) -> registerControllerMethod 'get', relativeUri, handler
-	global.POST = (relativeUri, handler = null) -> registerControllerMethod 'post', relativeUri, handler
-	global.HEAD = (relativeUri, handler = null) -> registerControllerMethod 'head', relativeUri, handler
-	global.PUT = (relativeUri, handler = null) -> registerControllerMethod 'put', relativeUri, handler
-	global.DELETE = (relativeUri, handler = null) -> registerControllerMethod 'del', relativeUri, handler
+	global.GET = (args...) -> registerControllerMethod 'get', args
+	global.POST = (args...) -> registerControllerMethod 'post', args
+	global.HEAD = (args...) -> registerControllerMethod 'head', args
+	global.PUT = (args...) -> registerControllerMethod 'put', args
+	global.DELETE = (args...) -> registerControllerMethod 'del', args
 
 	server.resource = (name, path = null) ->
 		path = "/#{name}" if path is null

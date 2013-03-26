@@ -1,7 +1,8 @@
 bunyan = require 'bunyan'
 log = bunyan.createLogger
-	name: APP_NAME
+	name: 'example server'
 	level: 'debug'
+	serializers: bunyan.stdSerializers
 
 restify = require 'restify'
 server = restify.createServer
@@ -18,6 +19,7 @@ server.use restify.bodyParser { mapParams:no }
 
 require('../index')(server, log, "#{__dirname}/resources")
 server.resource 'items'
+server.resource 'test'
 
 port = process.env.PORT or 3000
 host = process.env.HOST or '0.0.0.0'
