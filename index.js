@@ -35,37 +35,37 @@ module.exports = function(server, log, resourcesPath) {
     fullUri = "" + currentConfiguringControllerPath + "/" + relativeUri;
     currentConfiguringControllerActions.push("" + verb + " " + relativeUri);
     return server[verb](fullUri, function(req, res, next) {
-      var nextHandler;
-      nextHandler = function(err) {
-        if (err) {
-          return next(err);
-        } else {
-          handler = handlers.shift();
-          if (handler) {
-            return handler.call({
-              req: req,
-              res: res,
-              next: nextHandler,
-              respond: function(err, o) {
-                if (err) {
-                  log.error(err, "Error handling request");
-                  return next(err);
-                } else if (o) {
-                  log.info(o, "Successfully handled request");
-                  return res.send(o);
-                } else {
-                  err = new restify.ResourceNotFoundError("Object not found");
-                  log.error(err);
-                  return next(err);
-                }
-              }
-            });
+      var context;
+      context = {
+        req: req,
+        res: res,
+        next: function(err) {
+          if (err) {
+            return next(err);
           } else {
-            return next();
+            handler = handlers.shift();
+            if (handler) {
+              return handler.call(context);
+            } else {
+              return next();
+            }
+          }
+        },
+        respond: function(err, o) {
+          if (err) {
+            log.error(err, "Error handling request");
+            return next(err);
+          } else if (o) {
+            log.info(o, "Successfully handled request");
+            return res.send(o);
+          } else {
+            err = new restify.ResourceNotFoundError("Object not found");
+            log.error(err);
+            return next(err);
           }
         }
       };
-      return nextHandler();
+      return context.next();
     });
   };
   global.GET = function(relativeUri, handler) {
