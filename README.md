@@ -3,5 +3,6 @@ se7ensky-restify-resource
 
 Pretty resource routing for restify
 
-== Installing ==
+Installing
+----------
 ```npm install se7ensky-restify-resource```
