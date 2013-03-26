@@ -23,7 +23,7 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 		fullUri = "#{currentConfiguringControllerPath}/#{relativeUri}"
 		currentConfiguringControllerActions.push "#{verb} #{relativeUri}"
 		server[verb] fullUri, (req, res, next) ->
-			context =
+			req.context = res.context =
 				req: req
 				res: res
 				next: (err) ->
@@ -46,7 +46,7 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 						err = new restify.ResourceNotFoundError "Object not found"
 						log.error err
 						next err
-			context.next()
+			req.context.next()
 
 	global.GET = (relativeUri, handler = null) -> registerControllerMethod 'get', relativeUri, handler
 	global.POST = (relativeUri, handler = null) -> registerControllerMethod 'post', relativeUri, handler
