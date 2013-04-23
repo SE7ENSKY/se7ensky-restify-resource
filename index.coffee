@@ -17,36 +17,38 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 
 		fullUri = "#{currentConfiguringControllerPath}/#{relativeUri}"
 		currentConfiguringControllerActions.push "#{verb} #{fullUri}"
-		server[verb] fullUri, (req, res, next) ->
+		server[verb] fullUri, (req, res, globalNext) ->
 			handlers = args.slice()
 			req.log.debug { req: req }, "Received request"
 			req.context = res.context =
 				req: req
 				res: res
+				log: req.log
+				globalNext: globalNext
 				next: (err) ->
 					if err
 						req.log.error { err: err }, "Error handling request"
-						next err
+						globalNext err
 					else
 						handler = handlers.shift()
 						if handler
-							callNext = handlers.length is 0
 							handler.call req.context
-							req.context.next() if callNext
 						else
 							req.log.debug { res: res }, "Request handled"
-							next()
-				respond: (err, o) ->
+							globalNext()
+				respond: (err, o = null) ->
+					if o is null and typeof err is 'string'
+						o = err
+						err = null
+
 					if err
-						log.error err, "Error handling request"
-						next err
+						req.context.next err
 					else if o
-						log.info o, "Successfully handled request"
+						req.log.info { object: o }, "Responding with object"
 						res.send o
 					else
 						err = new restify.ResourceNotFoundError "Object not found"
-						log.error err
-						next err
+						req.context.next err
 			req.context.next()
 
 	global.GET = (args...) -> registerControllerMethod 'get', args
