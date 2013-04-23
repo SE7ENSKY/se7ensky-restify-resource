@@ -1,5 +1,22 @@
 restify = require 'restify'
 
+mongoose = require 'mongoose'
+util = require 'util'
+
+RestMongooseValidationError = (mongooseValidationError) ->
+	restify.RestError.call @,
+		restCode: 'ValidationError'
+		statusCode: 409
+		message: mongooseValidationError.message
+		constructorOpt: RestMongooseValidationError
+		body:
+			code: 'ValidationError'
+			message: mongooseValidationError.message
+			errors: mongooseValidationError.errors
+	@name = 'RestMongooseValidationError'
+
+util.inherits RestMongooseValidationError, restify.RestError
+
 module.exports = (server, log, resourcesPath = 'resources') ->
 	currentConfiguringControllerName = null
 	currentConfiguringControllerPath = null
@@ -42,7 +59,10 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 						err = null
 
 					if err
-						req.context.next err
+						if err instanceof mongoose.Error.ValidationError
+							req.context.next new RestMongooseValidationError err
+						else
+							req.context.next err
 					else if o
 						req.log.info { object: o }, "Responding with object"
 						res.send o
