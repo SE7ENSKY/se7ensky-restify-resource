@@ -32,3 +32,23 @@ GET 'asyncerrorrespond', ->
 	setTimeout =>
 		@respond new Error 'test error'
 	, 1000
+
+m1 = ->
+	@m1 = 1
+	@next()
+a1 = [
+	->
+		@a1 = {} if not @a1
+		@a1.one = 11
+		@next()
+	->
+		@a1 = {} if not @a1
+		@a1.two = 12
+		@next()
+]
+a2 = [
+	->
+		@res.send { m1:@m1, a1:@a1 }
+]
+
+GET 'middlewaresTest', m1, a1, a2

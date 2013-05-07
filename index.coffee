@@ -17,13 +17,24 @@ RestMongooseValidationError = (mongooseValidationError) ->
 
 util.inherits RestMongooseValidationError, restify.RestError
 
+explodeMiddlewares = (input) ->
+	if input instanceof Array
+		result = []
+		for item in input
+			result = result.concat explodeMiddlewares item
+		result
+	else
+		[ input ]
+
 module.exports = (server, log, resourcesPath = 'resources') ->
 	currentConfiguringControllerName = null
 	currentConfiguringControllerPath = null
 	currentConfiguringControllerActions = []
+
 	registerControllerMethod = (verb, args) ->
 		relativeUri = if typeof args[0] is 'string' then args.shift() else ''
 
+		args = explodeMiddlewares args
 		for handler in args
 			if typeof handler isnt 'function'
 				log.error

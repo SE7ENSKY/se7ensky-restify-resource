@@ -1,7 +1,7 @@
 {
     "name": "se7ensky-restify-resource",
     "description": "Pretty resource routing for restify",
-    "version": "1.1.9",
+    "version": "1.2.0",
     "homepage" : "https://github.com/Se7enSky/se7ensky-restify-resource",
     "engines": {
         "node": "*"
