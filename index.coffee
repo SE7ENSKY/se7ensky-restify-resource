@@ -87,6 +87,7 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 	global.HEAD = (args...) -> registerControllerMethod 'head', args
 	global.PUT = (args...) -> registerControllerMethod 'put', args
 	global.DELETE = (args...) -> registerControllerMethod 'del', args
+	global.OPTIONS = (args...) -> registerControllerMethod 'opts', args
 
 	server.resource = (name, path = null) ->
 		path = "/#{name}" if path is null
