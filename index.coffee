@@ -60,7 +60,7 @@ module.exports = (server, log, resourcesPath = 'resources') ->
 					else
 						handler = handlers.shift()
 						if handler
-							handler.call req.context
+							handler.call req.context, req, res, req.context.next
 						else
 							req.log.debug { res: res }, "Request handled"
 							globalNext()
