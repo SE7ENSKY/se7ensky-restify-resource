@@ -53,9 +53,15 @@ DELETE ':id', ->
   @res.send customers[@req.params.id]
   delete customers[@req.params.id]
 
-exampleMiddleware = ->
+exampleMiddleware1 = ->
   @test = 5
-GET 'test', exampleMiddleware, ->
+  @req.log.info { some: 'object' }, 'Some object log record'
+  @next()
+
+exampleMiddleware2 = (req, res, next) ->
+  next()
+
+GET 'test', exampleMiddleware1, exampleMiddleware2 ->
   @res.send @test
 ```
 
