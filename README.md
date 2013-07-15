@@ -61,7 +61,7 @@ exampleMiddleware1 = ->
 exampleMiddleware2 = (req, res, next) ->
   next()
 
-GET 'test', exampleMiddleware1, exampleMiddleware2 ->
+GET 'test', exampleMiddleware1, exampleMiddleware2, ->
   @res.send @test
 ```
 
